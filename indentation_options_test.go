@@ -5,47 +5,53 @@ import (
 )
 
 func TestIndentationOptionsDefaults(t *testing.T) {
-	opt := IndentationOptions{}
+	options := IndentationOptions{}
 
-	if opt.Character != 0 {
-		t.Errorf("expected default Character to be 0, got %q", opt.Character)
+	if options.Character != 0 {
+		t.Errorf("expected default Character to be 0, got %q", options.Character)
 	}
-	if opt.Enabled != false {
-		t.Errorf("expected default Enabled to be false, got %v", opt.Enabled)
+
+	if options.Enabled != false {
+		t.Errorf("expected default Enabled to be false, got %v", options.Enabled)
 	}
-	if opt.Size != 0 {
-		t.Errorf("expected default Size to be 0, got %d", opt.Size)
+
+	if options.Size != 0 {
+		t.Errorf("expected default Size to be 0, got %d", options.Size)
 	}
 }
 
 func TestIndentationOptionsAssignment(t *testing.T) {
-	opt := IndentationOptions{
+	options := IndentationOptions{
 		Character: '\t',
 		Enabled:   true,
 		Size:      4,
 	}
 
-	if opt.Character != '\t' {
-		t.Errorf("expected Character to be '\\t', got %q", opt.Character)
+	if options.Character != '\t' {
+		t.Errorf("expected Character to be '\\t', got %q", options.Character)
 	}
-	if opt.Enabled != true {
-		t.Errorf("expected Enabled to be true, got %v", opt.Enabled)
+
+	if options.Enabled != true {
+		t.Errorf("expected Enabled to be true, got %v", options.Enabled)
 	}
-	if opt.Size != 4 {
-		t.Errorf("expected Size to be 4, got %d", opt.Size)
+
+	if options.Size != 4 {
+		t.Errorf("expected Size to be 4, got %d", options.Size)
 	}
 }
 
 func TestNewIndentationOptions(t *testing.T) {
-	opt := NewIndentationOptions()
+	options := NewIndentationOptions()
 
-	if opt.Character != '\t' {
-		t.Errorf("expected Character to be '\\t', got %q", opt.Character)
+	if options.Character != '\t' {
+		t.Errorf("expected Character to be '\\t', got %q", options.Character)
 	}
-	if opt.Enabled != true {
-		t.Errorf("expected Enabled to be true, got %v", opt.Enabled)
+
+	if options.Enabled != true {
+		t.Errorf("expected Enabled to be true, got %v", options.Enabled)
 	}
-	if opt.Size != 1 {
-		t.Errorf("expected Size to be 1, got %d", opt.Size)
+
+	if options.Size != 1 {
+		t.Errorf("expected Size to be 1, got %d", options.Size)
 	}
 }

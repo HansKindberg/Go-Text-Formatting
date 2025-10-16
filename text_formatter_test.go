@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
-func Test_4_arne(t *testing.T) {
-	t.Fail()
+func TestTextFormatterDeclaration(t *testing.T) {
+	// Just a compile time test.
+	var _ TextFormatter[Options]
 }
