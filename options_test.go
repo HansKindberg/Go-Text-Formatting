@@ -5,5 +5,7 @@ import (
 )
 
 func Test_2(t *testing.T) {
-	t.Fail()
+	if 1 == 2 {
+		t.Errorf("Arne")
+	}
 }
