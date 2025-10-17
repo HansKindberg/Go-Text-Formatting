@@ -2,6 +2,8 @@ package textfmt
 
 import (
 	"io"
+	"os"
+	"path"
 	"testing"
 )
 
@@ -40,37 +42,29 @@ func TestFormatBytes(t *testing.T) {
 }
 
 func TestFormatFile(t *testing.T) {
-	a := t.TempDir()
-	t.Errorf("Directory \"%s\"", a)
+	input := "./testdata/text_formatter_extension/input.txt"
+	inputBytes, err := os.ReadFile(input)
+	if err != nil {
+		t.Fatalf("Failed to read input file: %v", err)
+	}
+	inputText := string(inputBytes)
 
-	//t.Fail()
+	output := path.Join(t.TempDir(), "output.txt")
+	err = FormatFile(testFormatter{}, Options{}, input, output)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
 
-	/* 	content := "File content."
+	outputBytes, err := os.ReadFile(output)
+	if err != nil {
+		t.Fatalf("Failed to read output file: %v", err)
+	}
+	actualText := string(outputBytes)
+	expectedText := "Formatted: " + inputText
 
-	   	tmpFile, err := os.CreateTemp(t.TempDir(), "testfile-*.txt")
-	   	if err != nil {
-	   		t.Fatalf("Failed to create temp file: %v", err)
-	   	}
-	   	defer tmpFile.Close()
-
-	   	if _, err := tmpFile.WriteString(content); err != nil {
-	   		t.Fatalf("Failed to write to temp file: %v", err)
-	   	}
-
-	   	actualPath, err := FormatFile(testFormatter{}, Options{}, tmpFile.Name())
-	   	if err != nil {
-	   		t.Fatalf("Unexpected error: %v", err)
-	   	}
-
-	   	formattedBytes, err := os.ReadFile(actualPath)
-	   	if err != nil {
-	   		t.Fatalf("Failed to read formatted file: %v", err)
-	   	}
-
-	   	expected := "Formatted: " + content
-	   	if string(formattedBytes) != expected {
-	   		t.Errorf("Expected %q, got %q", expected, string(formattedBytes))
-	   	} */
+	if actualText != expectedText {
+		t.Errorf("Expected \"%s\", got \"%s\"", expectedText, actualText)
+	}
 }
 
 func TestFormatString(t *testing.T) {
