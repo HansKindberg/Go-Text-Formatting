@@ -1,0 +1,38 @@
+name: Build & test
+on:
+  push:
+    branches: [ "main", "Development", "Temporary" ]
+  pull_request:
+    branches: [ "main", "Development", "Temporary" ]
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        go: [1.21, 1.24]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    name: Go ${{ matrix.go }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Go setup
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Install dependencies
+      run: go mod download
+    - name: Build
+      run: go build -v ./...
+    - name: Run tests
+      run: go test -v ./...
