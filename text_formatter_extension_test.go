@@ -1,10 +1,12 @@
 package textfmt
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
 	"testing"
+	"time"
 )
 
 type testFormatter struct{}
@@ -49,7 +51,10 @@ func TestFormatFile(t *testing.T) {
 	}
 	inputText := string(inputBytes)
 
-	output := path.Join(t.TempDir(), "output.txt")
+	//output := path.Join(t.TempDir(), "output.txt")
+
+	output := path.Join(t.TempDir(), fmt.Sprintf("output-%d.txt", time.Now().UnixNano()))
+
 	err = FormatFile(testFormatter{}, Options{}, input, output)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
