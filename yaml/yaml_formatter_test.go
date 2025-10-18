@@ -1,69 +1,101 @@
 package yaml
 
 import (
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestSuccess(t *testing.T) {}
 
-/*
-import (
-	"io/ioutil"
-	"os"
-	"testing"
+func TestFormat(t *testing.T) {
+	tests := []struct {
+		optionsFileName string
+		yamlFileName    string
+	}{
+		{"arne", "arne"},
+		{"arne-mismatch", "arne-mismatch"},
+		/* 		{"Empty-01", "Arne"},
+		   		{"Empty-02", "Arne"}, */
+	}
 
-	"go.yaml.in/yaml/v4"
-)
+	yamlFormatter := YamlFormatter{}
 
-func Test_4(t *testing.T) {
-	//t.Fail()
-	t.Errorf("Det blev ett Arne fel")
+	for i, tt := range tests {
+		tt := tt // capture range variable
+		name := fmt.Sprintf("Case %03d", i+1)
+		t.Run(name, func(t *testing.T) {
+			t.Parallel() // 🧠 run subtests concurrently
+
+			input, err := getInputYaml(tt.yamlFileName)
+			if err != nil {
+				t.Fatalf("Failed to get input YAML reader: %v", err)
+			}
+
+			expected, err := getExpectedYaml(tt.yamlFileName)
+			if err != nil {
+				t.Fatalf("Failed to get expected YAML reader: %v", err)
+			}
+
+			var writer bytes.Buffer
+			err = yamlFormatter.Format(YamlOptions{}, input, &writer)
+
+			if err != nil {
+				t.Fatalf("Failed to format YAML: %v", err)
+			}
+
+			actualText := writer.String()
+
+			actualText = strings.TrimSuffix(actualText, "\n")
+
+			expectedBytes, err := io.ReadAll(expected)
+			if err != nil {
+				t.Fatalf("Failed to read expected YAML: %v", err)
+			}
+
+			expectedText := string(expectedBytes)
+
+			if actualText != expectedText {
+				t.Errorf("Mismatch for %s:\nDifference:\n%s", name, cmp.Diff(expectedText, actualText))
+				t.Errorf("Mismatch for %s:\nExpected:\n%s\nGot:\n%s", name, truncate(expectedText, 50), truncate(actualText, 50))
+			}
+		})
+	}
 }
 
-func Test_5(t *testing.T) {
-	source, err := os.Open("./in-5.yaml")
+func getExpectedYaml(fileName string) (io.Reader, error) {
+	return getYaml("./testdata/yaml_formatter/expected", fileName)
+}
+
+func getFile(directory string, extension string, fileName string) (io.Reader, error) {
+	path := filepath.Join(directory, fileName+"."+extension)
+	file, err := os.Open(path)
 	if err != nil {
-		t.Fatalf("Failed to open file: %v", err)
+		return nil, err
 	}
-	defer source.Close()
+	return file, nil
 }
 
-func Test_6(t *testing.T) {
-	decoder := yaml.NewDecoder(nil)
-	if decoder == nil {
-		t.Errorf("Decoder should not be nil")
-	}
-
-	source, err := os.Open("./in-5.yaml")
-	if err != nil {
-		t.Fatalf("Failed to open file: %v", err)
-	}
-
-	defer source.Close()
+func getInputYaml(fileName string) (io.Reader, error) {
+	return getYaml("./testdata/yaml_formatter", fileName)
 }
 
-func getFileContent(fileName string) string {
-	content, err := os.ReadFile("./in-5.yaml")
-
-	if err == nil {
-
-	}
-
-	if content == nil {
-
-	}
-
-	fileBytes, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		panic(err)
-	}
-
-	yamlContent := string(fileBytes)
-
-	if yamlContent == "" {
-
-	}
-
-	return "Arne"
+func getYaml(directory string, fileName string) (io.Reader, error) {
+	return getFile(directory, "yaml", fileName)
 }
-*/
+
+func truncate(text string, numberOfCharacters int) string {
+	runes := []rune(text) // Handles Unicode
+
+	if len(runes) > numberOfCharacters {
+		return string(runes[:numberOfCharacters]) + "…"
+	}
+
+	return text
+}
